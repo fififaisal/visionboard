@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c0a1a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Rencana Kita</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0c0a1a;--glass:rgba(255,255,255,.06);--line:rgba(255,255,255,.11);--txt:#f1eefb;--mut:#a39fbd;--vio:#7c5cff;--gold:#f2c46b;--bad:#ff7b8a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--ink);color:var(--txt);font:400 15px/1.45 'Plus Jakarta Sans',system-ui,sans-serif}
+body{background:radial-gradient(600px 400px at 90% -5%,rgba(124,92,255,.28),transparent),radial-gradient(500px 360px at -10% 30%,rgba(242,196,107,.10),transparent),var(--ink);min-height:100vh;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+#app{padding:calc(18px + env(safe-area-inset-top)) 16px 0;max-width:560px;margin:auto}
+h1{font-size:26px;font-weight:800;margin:6px 0 2px;letter-spacing:-.3px}
+h2{font-size:17px;font-weight:800;margin:26px 0 10px}
+h4{font-size:13px;font-weight:600;color:var(--gold);margin:16px 0 6px}
+small,.mut{color:var(--mut);display:block;font-size:13px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.hero{background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(242,196,107,.18));padding:18px}
+.row{display:flex;align-items:center;gap:12px}.grow{flex:1;min-width:0}.grow b{display:block;font-weight:600}
+.rp{font-weight:800;color:var(--gold);white-space:nowrap}
+.big{font-size:30px;font-weight:800;letter-spacing:-.5px}
+.bar{height:8px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}
+.bar span{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--vio),var(--gold));transition:width .5s}
+.btn{min-height:52px;border:0;border-radius:16px;padding:0 20px;font:800 16px inherit;font-family:inherit;color:#1a1305;background:linear-gradient(135deg,#ffd98a,var(--gold));box-shadow:0 6px 18px rgba(242,196,107,.25);width:100%}
+.btn.ghost{background:var(--glass);color:var(--txt);border:1px solid var(--line);box-shadow:none}
+.btn.bad{background:var(--bad);color:#2a0910;box-shadow:none}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.6}
+.chk{flex:none;width:46px;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(#27234a,#1a1736);color:transparent;font-size:22px;font-weight:800;box-shadow:0 5px 0 #08061a,inset 0 1px 0 rgba(255,255,255,.12);transition:.15s}
+.chk.on{color:#1a1305;background:linear-gradient(135deg,#ffe3a0,var(--gold));box-shadow:0 1px 0 #8a6a22,0 0 18px rgba(242,196,107,.45);transform:translateY(4px)}
+.map{display:inline-flex;gap:6px;align-items:center;margin-top:6px;padding:5px 11px;border-radius:99px;border:1px dashed var(--gold);color:var(--gold);font-size:13px;font-weight:600;text-decoration:none}
+.map i{font-style:normal;opacity:.8}.map.off{border-color:var(--line);color:var(--mut)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:12px -16px 4px;padding-left:16px;scrollbar-width:none}
+.chips button{flex:none;min-height:42px;padding:0 16px;border-radius:99px;border:1px solid var(--line);background:var(--glass);color:var(--mut);font:600 14px inherit;font-family:inherit}
+.chips button.on{background:linear-gradient(135deg,var(--vio),#a68bff);color:#fff;border-color:transparent}
+.back{background:none;border:0;color:var(--mut);font:600 14px inherit;font-family:inherit;min-height:44px;padding:0}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));background:rgba(12,10,26,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line);z-index:5}
+nav button{flex:1;min-height:56px;background:none;border:0;color:var(--mut);font:600 11px inherit;font-family:inherit;display:grid;gap:2px;place-items:center}
+nav button span{font-size:21px}nav button.on{color:var(--gold)}
+.fab{position:fixed;right:18px;bottom:calc(86px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:20px;border:0;font-size:30px;font-weight:800;color:#1a1305;background:linear-gradient(135deg,#ffd98a,var(--gold));box-shadow:0 10px 26px rgba(242,196,107,.35);z-index:4}
+.empty{text-align:center;padding:34px 18px;color:var(--mut)}.empty div{font-size:38px;margin-bottom:8px}
+.sk{height:74px;border-radius:18px;margin-bottom:10px;background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.12),rgba(255,255,255,.05));background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+#sh{position:fixed;inset:0;display:none;align-items:flex-end;background:rgba(5,3,14,.6);z-index:9}
+#sh.open{display:flex}
+#sh .pane{width:100%;max-width:560px;margin:auto;max-height:90vh;overflow:auto;background:#15122b;border:1px solid var(--line);border-radius:26px 26px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom));animation:up .25s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 5px}
+input[type=text],input[type=number],input[type=date],input[type=password],input[type=url],input:not([type]){width:100%;min-height:50px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt);padding:0 14px;font:inherit;color-scheme:dark}
+input:focus{outline:2px solid var(--vio)}
+.fc{display:flex;gap:10px;align-items:center;margin-top:14px}.fc input{width:26px;height:26px;accent-color:var(--gold)}
+#toast{position:fixed;left:16px;right:16px;top:calc(12px + env(safe-area-inset-top));z-index:20;pointer-events:none}
+#toast div{margin:auto;max-width:420px;padding:13px 16px;border-radius:14px;font-weight:600;background:#1f1b3d;border:1px solid var(--line);animation:up .25s}
+#toast .ok{border-color:var(--gold)}#toast .no{border-color:var(--bad);color:var(--bad)}
+select{width:100%;min-height:50px;border-radius:14px;border:1px solid var(--line);background:#1b1836;color:var(--txt);padding:0 12px;font:inherit}
+.ico{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(242,196,107,.25))}
+.tag{display:inline-block;margin:6px 6px 0 0;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:hsl(var(--h) 60% 50% / .22);color:hsl(var(--h) 80% 80%)}
+@media (min-width:600px){.chips{flex-wrap:wrap;overflow:visible;margin:12px 0 4px;padding-left:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div><nav id="nav"></nav><div id="toast"></div><div id="sh"></div>
+<script>
+const API='https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnTXHS8h5eQykXSXdHaQsxHrQa7cvwDD0ctk_cCh5rY4HS7xG8lNK6-4DgEpmxxULwrDEevMe_1c6JVHS-FCzthszqwcvdfRWng5QqD58r-4Tm1Qz3W5ydcDCANVSMw8X1mkkS02vl2b7GiAtIlzvMB8Zb6m0NbgD2Sbsy0HJoD_QRBBPj6w7ZsMxpEgNkIoVp4AUCQEygrqxn58fbmZvHg_g1FMHUb7w0MUN5tWJlCUHmiau2aCwAZKXkE77KKivQBg-9GCANO1SUqYZeTF7W6lD1xVoA&lib=MjjEklXY_xhOc2CJnSaAiBjuscRo3f4dh';   // isi dengan URL web app dari Apps Script
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rp=n=>'Rp '+new Intl.NumberFormat('id-ID').format(+n||0);
+const TABS=[['home','🏠','Beranda'],['trip','✈️','Trip'],['vision','✨','Vision'],['baby','🍼','Baby'],['reno','🔨','Renovasi']];
+const LATIHAN=false;   // true hanya pada salinan latihan: menampilkan penanda "Mode latihan"
+const PWK='pw:'+location.pathname;
+let pass=localStorage.getItem(PWK)||'',D={trip:[],vision:[],baby:[],reno:[]},tab='home',cur=null,bi=0;
+const pd=s=>/^\d{4}-\d\d-\d\d$/.test(s)?new Date(s+'T00:00:00'):null;
+const idDate=d=>d?d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'';
+const cu=()=>tab==='trip'?cur:D[tab][0];
+const val=t=>t.actual>0?t.actual:t.total;   // nyata jika sudah tercatat, kalau belum pakai rencana
+const bt=b=>/^TOTAL BUDGET/i.test(b.title)?'TOTAL BUDGET (nyata)':b.title;
+const tripHero=S=>S.actualSrc==='subtotal'?`<div class="card hero" style="margin-top:14px"><small>Total pengeluaran</small><div class="big">${rp(S.actual)}</div><small>Jumlah subtotal akomodasi dan itinerary</small></div>`:`<div class="card hero" style="margin-top:14px"><small>Pengeluaran nyata (total budget)</small><div class="big">${S.actual==null?'Belum dicatat':rp(S.actual)}</div><small>Rencana (estimasi): ${rp(S.total)}${S.actual>0&&S.actual!==S.total?', '+(S.actual>S.total?'melebihi ':'di bawah ')+rp(Math.abs(S.actual-S.total)):''}</small></div>`;
+const ico=c=>({financial:'💰',personal:'🌱',career:'💼',health:'💪',education:'📚',spiritual:'🕌',family:'👨‍👩‍👧',travel:'✈️',home:'🏠'})[String(c).toLowerCase()]||'';
+const locs=S=>{const m={};S.blocks.filter(b=>/^IT/i.test(b.title)).forEach(b=>b.rows.forEach(it=>{const x=parts(b,it);if(x.map&&/^https?:/.test(x.map.u))m[x.map.u]=x.map.label}));return Object.entries(m)};
+const hue=s=>[...String(s)].reduce((a,c)=>(a*31+c.charCodeAt(0))%360,7);
+
+function toast(m,ok=1){const e=document.createElement('div');e.className=ok?'ok':'no';e.textContent=m;$('#toast').append(e);setTimeout(()=>e.remove(),2800)}
+async function api(a,p={}){
+ let j;try{const r=await fetch(API,{method:'POST',body:JSON.stringify({pass,a,...p})});j=await r.json()}catch(e){throw new Error('Tidak bisa terhubung. Periksa sinyal dan URL web app.')}
+ if(!j.ok){if(/Passphrase/.test(j.error)){localStorage.removeItem(PWK);pass=''}throw new Error(j.error)}return j.data}
+
+function nav(){$('#nav').innerHTML=TABS.map(t=>`<button class="${tab===t[0]?'on':''}" onclick="go('${t[0]}')"><span>${t[1]}</span>${t[2]}</button>`).join('')}
+function go(t){tab=t;cur=null;bi=0;show();scrollTo(0,0)}
+function open1(n){tab='trip';cur=D.trip.find(t=>t.name===n);bi=0;show();scrollTo(0,0)}
+function show(){
+ nav();const a=$('#app');
+ if(!pass){a.innerHTML=`<h1>Rencana Kita</h1><small>Masukkan passphrase (angka) untuk membuka data.</small><div class="card" style="margin-top:18px"><label>Passphrase</label><input type="password" id="pw" inputmode="numeric" pattern="[0-9]*" autocomplete="current-password"><button class="btn" style="margin-top:16px" onclick="login()">Buka</button></div>`;return}
+ const S=tab==='home'?null:cu();
+ a.innerHTML=tab==='home'?home():tab==='trip'?(cur?detail(cur):list()):(S?detail(S):`<div class="empty card"><div>🔍</div><b>Tab tidak ditemukan</b><small>Pastikan nama tab di spreadsheet tidak diubah.</small></div>`);
+ if(LATIHAN)a.insertAdjacentHTML('afterbegin','<span class="tag" style="--h:40;margin:0 0 8px">Mode latihan</span>');
+ document.querySelector('.fab')?.remove();
+ if(S&&S.blocks[bi]&&!S.blocks[bi].ro)document.body.insertAdjacentHTML('beforeend','<button class="fab" onclick="openForm()" aria-label="Tambah">+</button>');
+}
+async function login(){pass=$('#pw').value.trim();if(!pass)return toast('Passphrase belum diisi',0);localStorage.setItem(PWK,pass);await load()}
+async function load(){
+ $('#app').innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
+ try{const all=await api('list');D={trip:[],vision:[],baby:[],reno:[]};all.forEach(s=>D[s.mod].push(s));show()}
+ catch(e){toast(e.message,0);if(!pass)show();else $('#app').innerHTML=`<div class="empty card"><div>📡</div><b>Gagal memuat</b><small>${esc(e.message)}</small><button class="btn ghost" style="margin-top:14px" onclick="load()">Coba lagi</button></div>`}
+}
+
+// Susun tampilan satu baris dari struktur kolom apa pun
+function parts(b,it){
+ const C=b.cols,v=it.v,ix=k=>C.findIndex(c=>c.kind===k),ci=ix('check'),pi=ix('pin'),qi=ix('qty'),di=ix('date');
+ const M=C.map((c,i)=>c.kind==='money'?i:-1).filter(i=>i>=0),mi=M.length?M[M.length-1]:-1,itin=/^IT/i.test(b.title);
+ const li=C.findIndex(c=>/LOCATION|LOKASI/i.test(c.label));
+ const ky=C.findIndex(c=>c.kind==='text'&&/NAME|NAMA|GOAL|ACTIVITY|AKTIV|BARANG|BAWAAN|ITEM/i.test(c.label));
+ const pt=pi>=0?String(v[pi]||''):'',isU=/^https?:\/\//.test(pt),u=pi>=0?(it.url||(isU?pt:'')):'';
+ const used=new Set([ci,pi,mi,di,qi]);let t='';
+ if(ky>=0&&v[ky]!==''){t=v[ky];used.add(ky)}
+ else if(pi>=0&&pt&&!isU)t=pt;
+ else{const f=C.findIndex((c,i)=>c.kind==='text'&&v[i]!==''&&!used.has(i));if(f>=0){t=v[f];used.add(f)}}
+ if(u&&isU&&li>=0)used.add(li);
+ const sub=[],chips=[];
+ if(qi>=0&&v[qi]!=='')sub.push(typeof v[qi]==='number'?v[qi]+'×'+(M.length>1&&typeof v[M[0]]==='number'?' '+rp(v[M[0]]):''):v[qi]);
+ if(di>=0&&!itin&&v[di])sub.push(idDate(pd(v[di]))||v[di]);
+ C.forEach((c,i)=>{if(used.has(i)||v[i]===''||v[i]==='-'||v[i]===false)return;if(c.kind==='select')chips.push(v[i]);else if(c.kind==='text')sub.push(v[i])});
+ const r=mi>=0&&typeof v[mi]==='number'&&(v[mi]>0||!itin)?rp(v[mi]):'';
+ return{t:String(t),sub:sub.join(', '),chips,r,ci,map:u?{u,label:isU?(li>=0&&v[li]?v[li]:'Buka di Maps'):pt}:null};
+}
+function card(b,it){
+ const x=parts(b,it);
+ return `<div class="card row" ${b.ro?'':`onclick="openForm(${it.row})"`}>${x.ci>=0?`<button class="chk ${it.v[x.ci]===true?'on':''}" aria-label="Tandai" onclick="event.stopPropagation();tog(${it.row},${x.ci})">✓</button>`:''}${x.chips.map(ico).find(Boolean)?`<span class="ico">${x.chips.map(ico).find(Boolean)}</span>`:''}<div class="grow"><b>${/^https?:\/\//.test(x.t)?`<a href="${esc(x.t)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--gold)">${esc(x.t.replace(/^https?:\/\//,'').slice(0,38))} ↗</a>`:esc(x.t)||'(tanpa judul)'}</b>${x.sub?`<small>${esc(x.sub)}</small>`:''}${x.chips.map(c=>`<span class="tag" style="--h:${hue(c)}">${esc(c)}</span>`).join('')}${x.map&&/^https?:/.test(x.map.u)?`<a class="map" href="${esc(x.map.u)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📍 ${esc(x.map.label)} <i>↗</i></a>`:''}</div>${x.r?`<span class="rp">${x.r}</span>`:''}</div>`;
+}
+const bars=(arr,mx)=>arr.map(([n,t])=>`<div style="margin-bottom:12px"><div class="row"><span class="grow">${esc(n)}</span><b class="rp">${rp(t)}</b></div><div class="bar"><span style="width:${t/mx*100}%"></span></div></div>`).join('');
+const done=b=>{const ci=b.cols.findIndex(c=>c.kind==='check');return ci<0?[0,b.rows.length]:[b.rows.filter(r=>r.v[ci]===true).length,b.rows.length]};
+
+function plans(V){
+ if(!V)return[];const gi=V.cols.findIndex(c=>/GOAL/i.test(c.label)),si=V.cols.findIndex(c=>/START/i.test(c.label)),ci=V.cols.findIndex(c=>c.kind==='check'),di=V.cols.findIndex(c=>/DESC/i.test(c.label));
+ const G=[];V.rows.forEach(r=>{if(r.v[gi]!==''||!G.length)G.push({g:r.v[gi],s:si>=0?r.v[si]:'',rows:[]});G[G.length-1].rows.push(r)});
+ const lim=new Date();lim.setDate(lim.getDate()+14);
+ return G.filter(x=>pd(x.s)&&pd(x.s)<=lim&&!x.rows.every(r=>r.v[ci]===true)).map(x=>({...x,steps:x.rows.map(r=>r.v[di]).filter(Boolean)}))
+}
+function home(){
+ const n=new Date(),t0=new Date(n.getFullYear(),n.getMonth(),n.getDate());
+ const T=D.trip.map(x=>({...x,d:pd(x.date)})).sort((a,b)=>(a.d||0)-(b.d||0));
+ const nx=T.find(x=>x.d&&x.d>=t0),ps=T.filter(x=>x.d&&x.d<t0),mon=[];
+ T.forEach(t=>t.blocks.filter(b=>/^IT/i.test(b.title)).forEach(b=>{const di=b.cols.findIndex(c=>c.kind==='date');if(di<0)return;let d=null;b.rows.forEach(it=>{d=pd(it.v[di])||d;if(d&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear())mon.push({d,t:t.title,a:parts(b,it).t})})}));
+ const mx=Math.max(1,...T.map(val)),V=D.vision[0]?.blocks.find(b=>/^YEARLY/i.test(b.title)),Bb=D.baby[0],Rn=D.reno[0];
+ let vh='';
+ if(V){const[dn,tt]=done(V),pc=tt?Math.round(dn/tt*100):0,ci=V.cols.findIndex(c=>c.kind==='check'),todo=V.rows.filter(r=>r.v[ci]!==true);
+  vh=`<h2>${esc(V.title)}</h2><div class="card"><div class="row"><div class="big">${pc}%</div><small>${dn} dari ${tt} goal tercapai</small></div><div class="bar"><span style="width:${pc}%"></span></div></div>`+todo.slice(0,5).map(r=>`<div class="card"><b>${esc(parts(V,r).t)}</b><small>belum tercapai</small></div>`).join('')+(todo.length>5?`<small onclick="go('vision')">dan ${todo.length-5} goal lain belum tercapai, ketuk Vision</small>`:'')}
+ const bb=Bb?Bb.blocks.filter(b=>!b.ro&&b.sum>0&&!/^BABY REGISTRY/i.test(b.title)).map(b=>[b.title,b.sum]):[];
+ const RG=Bb?.blocks.find(b=>/^BABY REGISTRY/i.test(b.title)),rg=RG&&RG.cols.some(c=>c.kind==='check')?done(RG):null;
+ const pl=plans(D.vision[0]?.blocks.find(b=>/^KEY/i.test(b.title))),pk=pl.length?`<h2>Pengingat key plan</h2>`+pl.map(x=>`<div class="card"><b>${esc(x.g)}</b><small>mulai ${idDate(pd(x.s))}</small>${x.steps.map(s=>`<small>${esc(s)}</small>`).join('')}</div>`).join(''):'';
+ return `<small>${idDate(n)}</small><h1>Rencana Kita</h1>
+ ${nx?`<div class="card hero" onclick="open1('${esc(nx.name)}')"><small>Trip berikutnya</small><div class="big">${esc(nx.title)}</div><small>${idDate(nx.d)}, ${Math.ceil((nx.d-t0)/864e5)} hari lagi</small><div class="row" style="margin-top:12px"><span class="rp">${rp(nx.total)}</span><small>rencana (estimasi)</small></div></div>`:`<div class="empty card"><div>🧭</div><b>Belum ada trip mendatang</b><small>Buat trip baru dari menu Trip.</small></div>`}
+ <h2>Aktivitas bulan ini</h2>${mon.length?mon.map(m=>`<div class="card"><b>${esc(m.a)}</b><small>${idDate(m.d)}, ${esc(m.t)}</small></div>`).join(''):'<div class="empty card"><small>Belum ada aktivitas terjadwal bulan ini.</small></div>'}
+ ${vh}${pk}
+ <h2>Rekap trip selesai</h2>${ps.length?`<div class="card"><small>${ps.length} trip, total ${rp(ps.reduce((a,t)=>a+val(t),0))}</small></div>`+ps.map(t=>`<div class="card row" onclick="open1('${esc(t.name)}')"><div class="grow"><b>${esc(t.title)}</b><small>${idDate(t.d)}${t.duration?', '+esc(t.duration):''}</small></div><span class="rp">${rp(val(t))}</span></div>`).join(''):'<div class="empty card"><small>Belum ada trip yang selesai.</small></div>'}
+ <h2>Perbandingan total budget</h2>${T.length?`<div class="card">${bars(T.map(t=>[t.title+(t.actual>0?'':' (rencana)'),val(t)]),mx)}</div>`:'<div class="empty card"><small>Belum ada data.</small></div>'}
+ ${bb.length?`<h2>Baby registry</h2><div class="card"><small>Total rencana</small><div class="big">${rp(Bb.total)}</div><div style="margin-top:12px">${bars(bb,Math.max(...bb.map(x=>x[1])))}</div>${rg?`<small style="margin-top:8px">Registry: ${rg[0]} dari ${rg[1]} item sudah didapat</small>`:''}</div>`:''}
+ ${Rn?`<h2>Renovasi rumah</h2><div class="card row" onclick="go('reno')"><div class="grow"><small>Total pengeluaran tercatat</small></div><span class="rp">${rp(Rn.total)}</span></div>`:''}`;
+}
+function list(){
+ return `<h1>Trip</h1><small>Ketuk trip untuk melihat detail.</small><div style="margin:16px 0"><button class="btn" onclick="newTrip()">Buat trip baru</button></div>`+
+ (D.trip.length?[...D.trip].sort((a,b)=>(pd(b.date)||0)-(pd(a.date)||0)).map(t=>`<div class="card row" onclick="open1('${esc(t.name)}')"><div class="grow"><b>${esc(t.title)}</b><small>${idDate(pd(t.date))}${t.duration?', '+esc(t.duration):''}</small></div><span class="rp">${rp(val(t))}</span></div>`).join(''):'<div class="empty card"><div>✈️</div><b>Belum ada trip</b><small>Ketuk Buat trip baru untuk memulai.</small></div>');
+}
+function detail(S){
+ const bl=S.blocks;if(bi>=bl.length)bi=0;const b=bl[bi];let html='',last='';
+ if(b){const di=b.cols.findIndex(c=>c.kind==='date'),itin=/^IT/i.test(b.title);
+  b.rows.forEach(it=>{if(itin&&di>=0){const d=it.v[di];if(d&&d!==last){html+=`<h4>${idDate(pd(d))||esc(d)}</h4>`;last=d}}html+=card(b,it)});
+  if(b.sum>0&&S.mod!=='trip')html=`<small style="margin:10px 0">Subtotal ${rp(b.sum)}</small>`+html}
+ const hasMoney=S.mod!=='vision',bbars=(S.mod==='baby'||S.mod==='reno')?S.blocks.filter(x=>!x.ro&&x.sum>0&&!/^BABY REGISTRY/i.test(x.title)).map(x=>[x.title,x.sum]):[];
+ let V='';if(S.mod==='vision'&&b){const[dn,tt]=done(b),pc=tt?Math.round(dn/tt*100):0;V=`<div class="card hero" style="margin-top:14px"><small>Tercapai</small><div class="big">${pc}%</div><small>${dn} dari ${tt}</small><div class="bar"><span style="width:${pc}%"></span></div></div>`}
+ let extra='';
+ if(b&&S.mod==='baby'){const ki=b.cols.findIndex(c=>/CATEGORY/i.test(c.label)),mi=b.cols.map((c,i)=>c.kind==='money'?i:-1).filter(i=>i>=0).pop();
+  if(ki>=0&&mi!==undefined){const g={};b.rows.forEach(r=>{if(typeof r.v[mi]==='number'&&r.v[ki])g[r.v[ki]]=(g[r.v[ki]]||0)+r.v[mi]});const arr=Object.entries(g).filter(x=>x[1]>0);
+   if(arr.length)extra+=`<div class="card"><small>Estimasi per kategori</small><div style="margin-top:10px">${bars(arr,Math.max(...arr.map(x=>x[1])))}</div></div>`}
+  if(b.cols.some(c=>c.kind==='check')){const[dn,tt]=done(b);extra+=`<small style="margin-bottom:8px">Sudah didapat ${dn} dari ${tt} item</small>`}}
+ if(S.warn&&S.warn.length)extra+=`<div class="card"><b>Periksa kemungkinan hitungan ganda${S.actualSrc==='subtotal'?'':' di rencana'}</b>${S.warn.map(w=>`<small>${rp(w.amount)} ada di akomodasi (${esc(w.a)}) dan itinerary (${esc(w.b)})</small>`).join('')}</div>`;
+ if(S.mod==='trip'&&b&&/^IT/i.test(b.title)&&!b.cols.some(c=>c.kind==='money'))extra+=`<button class="btn ghost" style="margin-bottom:10px" onclick="addPrice()">Tambah kolom harga (opsional)</button>`;
+ if(S.mod==='trip'){const L=locs(S);if(L.length)extra+=`<div class="card"><small style="margin-bottom:6px">Lokasi trip</small>${L.map(([u,l])=>`<a class="map" href="${esc(u)}" target="_blank" rel="noopener" style="margin:4px 6px 0 0">📍 ${esc(l)} <i>↗</i></a>`).join('')}</div>`}
+ if(S.mod==='vision'&&b&&/^YEARLY/i.test(b.title))extra+=`<button class="btn ghost" style="margin-bottom:10px" onclick="newYear()">Mulai tahun baru</button>`;
+ return `${tab==='trip'?`<button class="back" onclick="go('trip')">‹ Semua trip</button>`:''}<h1>${esc(S.title)}</h1>${tab==='trip'?`<button class="back" style="min-height:36px" onclick="editTrip()">Ubah info trip</button>`:''}${S.date?`<small>${idDate(pd(S.date))}${S.duration?', '+esc(S.duration):''}</small>`:''}
+ ${S.mod==='trip'?tripHero(S):hasMoney?`<div class="card hero" style="margin-top:14px"><small>Total tercatat</small><div class="big">${rp(S.total)}</div></div>`:V}
+ ${bbars.length?`<div class="card">${bars(bbars,Math.max(...bbars.map(x=>x[1])))}</div>`:''}
+ ${extra}<div class="chips">${bl.map((x,i)=>`<button class="${i===bi?'on':''}" onclick="bi=${i};show()">${esc(bt(x))}</button>`).join('')}</div>
+ ${html||`<div class="empty card"><div>📭</div><b>Belum ada data</b><small>${!b||b.ro?'Blok ini hanya bisa dibaca.':'Ketuk + untuk menambah.'}</small></div>`}${tab==='trip'&&S.deletable?`<button class="btn ghost" style="margin-top:26px" onclick="askDelTrip()">Hapus trip ini</button>`:''}`;
+}
+async function tog(row,c){
+ const S=cu(),b=S.blocks[bi],it=b.rows.find(x=>x.row===row),nv=!(it.v[c]===true);it.v[c]=nv;show();
+ try{await api('cell',{sheet:S.name,blk:b.row,title:b.title,row,col:c,val:nv})}catch(e){it.v[c]=!nv;show();toast(e.message,0)}
+}
+function sheet(h){$('#sh').innerHTML=`<div class="pane">${h}</div>`;$('#sh').classList.add('open')}
+function closeSheet(){$('#sh').classList.remove('open')}
+$('#sh').addEventListener('click',e=>{if(e.target.id==='sh')closeSheet()});
+
+function openForm(row){
+ const S=cu(),b=S.blocks[bi],it=row?b.rows.find(x=>x.row===row):null;
+ sheet(`<h1>${it?'Ubah':'Tambah'} data</h1><small>${esc(bt(b))}</small>`+b.cols.filter(c=>!c.ro&&c.kind!=='no'&&c.kind!=='skip').map(c=>{
+  const v=it?it.v[c.i]:'',id='f'+c.i,L=esc(c.label==='Item'?'Nama':String(c.label).replace(/CINDY/ig,'FIFI'))+(c.kind==='money'?' (Rp)':'');
+  if(c.kind==='check')return `<div class="fc"><input type="checkbox" id="${id}" ${v===true?'checked':''}><label style="margin:0">${L}</label></div>`;
+  if(c.kind==='select')return `<label for="${id}">${L}</label><select id="${id}"><option value=""></option>${(c.opts||[]).map(o=>`<option ${o===v?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+  const ty=c.kind==='date'?'date':c.kind==='money'?'number':'text';
+  return `<label for="${id}">${c.kind==='pin'?'Lokasi / judul Maps':L}</label><input id="${id}" type="${ty}" ${ty==='number'?'inputmode="decimal" min="0"':c.kind==='qty'?'inputmode="decimal"':''} value="${esc(c.kind==='date'&&!/^\d{4}-/.test(v)?'':v)}">`}).join('')+
+  (b.cols.some(c=>c.kind==='pin')?`<label for="furl">Link Google Maps (opsional)</label><input id="furl" type="url" placeholder="https://maps.app.goo.gl/..." value="${esc(it?.url||'')}">`:'')+
+  `<button class="btn" id="sv" style="margin-top:20px" onclick="save(${row||0})">Simpan</button>`+
+  (it?`<button class="btn ghost" style="margin-top:10px" onclick="ask(${row})">Hapus</button>`:'')+
+  `<button class="back" style="margin-top:6px;width:100%" onclick="closeSheet()">Batal</button>`);
+}
+async function save(row){
+ const S=cu(),b=S.blocks[bi],vals=b.cols.map(()=>'');
+ for(const c of b.cols){if(c.ro||c.kind==='no'||c.kind==='skip')continue;const e=$('#f'+c.i);let v=c.kind==='check'?e.checked:e.value.trim();
+  if(c.kind==='money'&&v!==''){v=+v;if(isNaN(v)||v<0)return toast('Nominal tidak boleh negatif',0)}
+  if(c.kind==='qty'&&v!==''&&!isNaN(+v)){v=+v;if(v<0)return toast('Jumlah tidak boleh negatif',0)}
+  vals[c.i]=v}
+ const qc=b.cols.find(c=>c.kind==='qty'),mm=b.cols.filter(c=>c.kind==='money'&&!c.ro);
+ if(qc&&mm.length>1&&vals[mm[mm.length-1].i]===''&&typeof vals[qc.i]==='number'&&typeof vals[mm[0].i]==='number')vals[mm[mm.length-1].i]=vals[qc.i]*vals[mm[0].i];
+ const mc=b.cols.filter(c=>c.kind==='money'&&!c.ro),need=mc.length&&!/^IT/i.test(b.title)?mc[mc.length-1]:null;
+ if(need&&vals[need.i]==='')return toast('Nominal tidak boleh kosong',0);
+ const btn=$('#sv');btn.disabled=true;btn.textContent='Menyimpan...';
+ try{const r=await api(row?'upd':'add',{sheet:S.name,blk:b.row,title:b.title,row,vals,url:($('#furl')?.value||'').trim()});toast(r&&r.skipped?'Tersimpan. Sel berisi rumus tidak diubah.':'Tersimpan');closeSheet();await refresh()}
+ catch(e){toast('Gagal menyimpan: '+e.message,0);btn.disabled=false;btn.textContent='Simpan'}
+}
+function ask(row){sheet(`<h1>Hapus data ini?</h1><small>Baris akan dihapus dari spreadsheet dan tidak bisa dikembalikan dari aplikasi.</small><button class="btn bad" id="dl" style="margin-top:20px" onclick="del1(${row})">Ya, hapus</button><button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Batal</button>`)}
+async function del1(row){
+ const S=cu(),b=S.blocks[bi],btn=$('#dl');btn.disabled=true;
+ try{await api('del',{sheet:S.name,blk:b.row,title:b.title,row});toast('Terhapus');closeSheet();await refresh()}catch(e){toast('Gagal menghapus: '+e.message,0);btn.disabled=false}
+}
+async function refresh(){const S=cu(),t=await api('get',{sheet:S.name});D[t.mod]=D[t.mod].map(x=>x.name===t.name?t:x);if(tab==='trip')cur=t;show()}
+async function addPrice(){
+ const S=cu();
+ try{await api('addPrice',{sheet:S.name});toast('Kolom PRICE ditambahkan di itinerary');await refresh()}
+ catch(e){toast('Gagal: '+e.message,0)}
+}
+function askDelTrip(){
+ const S=cu();
+ sheet(`<h1>Hapus trip ini?</h1><small>Tab "${esc(S.name)}" akan dihapus dari spreadsheet. Isi yang sudah tercatat ikut hilang. Kalau terlanjur, tab bisa dipulihkan lewat Riwayat versi di Google Sheets, bukan dari aplikasi.</small>
+ <button class="btn bad" id="dt" style="margin-top:20px" onclick="doDelTrip()">Ya, hapus trip</button><button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Batal</button>`);
+}
+async function doDelTrip(){
+ const S=cu(),b=$('#dt');b.disabled=true;b.textContent='Menghapus...';
+ try{await api('delTrip',{sheet:S.name});toast('Trip dihapus');closeSheet();tab='trip';cur=null;await load()}
+ catch(e){toast('Gagal: '+e.message,0);b.disabled=false;b.textContent='Ya, hapus trip'}
+}
+function editTrip(){
+ const S=cu();
+ sheet(`<h1>Ubah info trip</h1><label for="et">Judul trip</label><input id="et" value="${esc(S.title)}"><label for="ed">Tanggal berangkat</label><input id="ed" type="date" value="${/^\d{4}-/.test(S.date||'')?S.date:''}"><label for="eu">Durasi</label><input id="eu" value="${esc(S.duration||'')}">
+ <button class="btn" id="sv" style="margin-top:20px" onclick="saveMeta()">Simpan</button><button class="back" style="margin-top:6px;width:100%" onclick="closeSheet()">Batal</button>`);
+}
+async function saveMeta(){
+ const S=cu(),title=$('#et').value.trim();if(!title)return toast('Judul tidak boleh kosong',0);
+ const b=$('#sv');b.disabled=true;b.textContent='Menyimpan...';
+ try{await api('meta',{sheet:S.name,title,date:$('#ed').value,duration:$('#eu').value.trim()});toast('Tersimpan');closeSheet();await refresh()}
+ catch(e){toast('Gagal menyimpan: '+e.message,0);b.disabled=false;b.textContent='Simpan'}
+}
+function newYear(){
+ const S=cu(),b=S.blocks[bi],y=((b.title.match(/\d{4}/)||[new Date().getFullYear()])[0]*1)+1;
+ sheet(`<h1>Mulai tahun baru?</h1><small>Tab Vision Board disalin dulu sebagai arsip, lalu tahun di judul Yearly Goals diganti dan semua centang dikosongkan. Teks goal tidak dihapus, jadi bisa kamu sunting atau hapus satu per satu.</small>
+ <label for="ny">Tahun baru</label><input id="ny" type="number" inputmode="numeric" value="${y}">
+ <button class="btn" id="sv" style="margin-top:20px" onclick="doYear()">Arsipkan dan mulai</button><button class="back" style="margin-top:6px;width:100%" onclick="closeSheet()">Batal</button>`);
+}
+async function doYear(){
+ const b=$('#sv');b.disabled=true;b.textContent='Mengarsipkan...';
+ try{const r=await api('newYear',{year:$('#ny').value});toast('Arsip dibuat: '+r.archive);closeSheet();await load()}
+ catch(e){toast('Gagal: '+e.message,0);b.disabled=false;b.textContent='Arsipkan dan mulai'}
+}
+function newTrip(){
+ sheet(`<h1>Trip baru</h1><small>Tab baru disalin dari template HONEYMOON TRIP - BAJO (CONTOH). Template aslinya tidak diubah.</small>
+ <label for="nt">Judul trip</label><input id="nt" placeholder="Contoh: Lombok 2027"><label for="nd">Tanggal berangkat</label><input id="nd" type="date"><label for="nu">Durasi</label><input id="nu" placeholder="Contoh: 4 DAYS">
+ <button class="btn" id="sv" style="margin-top:20px" onclick="mk()">Buat trip</button><button class="back" style="margin-top:6px;width:100%" onclick="closeSheet()">Batal</button>`);
+}
+async function mk(){
+ const title=$('#nt').value.trim(),date=$('#nd').value,duration=$('#nu').value.trim();
+ if(!title||!date)return toast('Judul dan tanggal wajib diisi',0);
+ const b=$('#sv');b.disabled=true;b.textContent='Membuat tab...';
+ try{const r=await api('newTrip',{title,date,duration});toast('Trip dibuat');closeSheet();await load();open1(r.name)}
+ catch(e){toast('Gagal: '+e.message,0);b.disabled=false;b.textContent='Buat trip'}
+}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+pass?load():show();
+</script>
+</body>
+</html>
