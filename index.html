@@ -91,7 +91,7 @@ select{width:100%;min-height:50px;border-radius:14px;border:1px solid var(--line
 <body>
 <div id="app"></div><nav id="nav"></nav><div id="toast"></div><div id="sh"></div>
 <script>
-const API='https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQYkFr1yXLkrQsp7EbPdhuXbb95t4CQvuyCxYPnRGDYPbzU2pJt9EB2fUSWKGG4bG-HGSnQA2nH2CB7yux521-UxRQdwXYU78_8qFcRTMOpWxE6eLKovW887lib4mWxN0fINmXSr5CoBcbJ93H5gY5wMTvYIXHFdjGQ1vVCgt5utNdMEJs3pjwT_z7OYwvEvWOjSK9bbRzKEA3-3dNEYioIPwte6zyCZO_Fd_Z-e_8l5taril8XLzH5n75NZPaV7DksPxJf1PTSW9r_C5B9bluyMRfjDA&lib=MjjEklXY_xhOc2CJnSaAiBjuscRo3f4dh';   // isi dengan URL web app dari Apps Script
+const API='https://script.google.com/macros/s/AKfycbwG425EvZ2pl1aEcwCGLtLvWujX0W5XjrR5WTIRoM-Q0EOWWjTsURaIU-04G5vCqY-nWQ/exec';   // isi dengan URL web app dari Apps Script
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rp=n=>'Rp '+new Intl.NumberFormat('id-ID').format(+n||0);
@@ -111,6 +111,7 @@ const hue=s=>[...String(s)].reduce((a,c)=>(a*31+c.charCodeAt(0))%360,7);
 
 function toast(m,ok=1){const e=document.createElement('div');e.className=ok?'ok':'no';e.textContent=m;$('#toast').append(e);setTimeout(()=>e.remove(),2800)}
 async function api(a,p={}){
+ if(/googleusercontent\.com/.test(API))throw new Error('Alamat di index.html adalah alamat pengalihan (googleusercontent.com), bukan URL /exec. Salin ulang dari Deploy > Kelola deployment > URL aplikasi web.');
  if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(API))throw new Error('URL web app di index.html belum benar. Harus diawali https://script.google.com/ dan berakhiran /exec.');
  let r,j;
  try{r=await fetch(API,{method:'POST',body:JSON.stringify({pass,a,...p})})}catch(e){throw new Error('Tidak bisa menghubungi server. Cek sinyal, dan pastikan akses deployment Apps Script adalah "Siapa saja".')}
@@ -133,7 +134,7 @@ async function login(){pass=$('#pw').value.trim();if(!pass)return toast('Passphr
 async function load(){
  $('#app').innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
  try{const all=await api('list');D={trip:[],vision:[],baby:[],reno:[]};all.forEach(s=>D[s.mod].push(s));show()}
- catch(e){toast(e.message,0);if(!pass)show();else $('#app').innerHTML=`<div class="empty card"><div>📡</div><b>Gagal memuat</b><small>${esc(e.message)}</small><button class="btn ghost" style="margin-top:14px" onclick="load()">Coba lagi</button></div>`}
+ catch(e){toast(e.message,0);if(!pass)show();else $('#app').innerHTML=`<div class="empty card"><div>📡</div><b>Gagal memuat</b><small>${esc(e.message)}</small><small style="margin-top:10px;word-break:break-all">URL yang dipakai aplikasi: ${esc(API.length>64?API.slice(0,40)+'...'+API.slice(-14):API)}</small><button class="btn ghost" style="margin-top:14px" onclick="load()">Coba lagi</button></div>`}
 }
 
 // Susun tampilan satu baris dari struktur kolom apa pun
