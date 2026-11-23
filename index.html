@@ -59,6 +59,32 @@ select{width:100%;min-height:50px;border-radius:14px;border:1px solid var(--line
 .ico{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(242,196,107,.25))}
 .tag{display:inline-block;margin:6px 6px 0 0;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:hsl(var(--h) 60% 50% / .22);color:hsl(var(--h) 80% 80%)}
 @media (min-width:600px){.chips{flex-wrap:wrap;overflow:visible;margin:12px 0 4px;padding-left:0}}
+@media (min-width:600px) and (max-width:899px){#app{max-width:720px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;align-items:start}.cards h4,.cards .empty{grid-column:1/-1}}
+.login{max-width:440px;margin:8vh auto 0}
+@media (min-width:900px){
+ body{padding-bottom:48px}
+ body.in{padding-left:236px}
+ #app{max-width:1180px;padding:36px 40px 0}
+ h1{font-size:32px}
+ nav{top:0;bottom:0;left:0;right:auto;width:236px;flex-direction:column;justify-content:flex-start;gap:6px;padding:30px 14px;border-top:0;border-right:1px solid var(--line)}
+ nav::before{content:'Rencana Kita';display:block;font-weight:800;font-size:21px;padding:2px 16px 26px;color:var(--gold)}
+ nav button{flex:none;display:flex;flex-direction:row;justify-content:flex-start;align-items:center;gap:14px;padding:0 16px;min-height:50px;border-radius:14px;border:1px solid transparent;font-size:15px}
+ nav button span{font-size:20px}
+ nav button.on{background:var(--glass);border-color:var(--line)}
+ .dash{column-width:340px;column-gap:30px}
+ .dash .card,.dash small{break-inside:avoid}
+ .dash h2{break-after:avoid}
+ .dash h2:first-child{margin-top:0}
+ .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:0 18px;align-items:start}
+ .cards h4,.cards .empty{grid-column:1/-1}
+ .hero{max-width:620px}
+ #app .btn{width:auto;min-width:240px}
+ #sh{align-items:center;justify-content:center}
+ #sh .pane{border-radius:26px;max-width:540px;max-height:86vh;animation:pop .2s ease-out}
+ @keyframes pop{from{transform:scale(.97);opacity:0}}
+ .fab{width:auto;height:56px;padding:0 24px;right:40px;bottom:36px;border-radius:18px;font-size:26px}
+ .fab::after{content:' Tambah';font-size:16px;font-weight:800;margin-left:6px;vertical-align:middle}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -85,15 +111,18 @@ const hue=s=>[...String(s)].reduce((a,c)=>(a*31+c.charCodeAt(0))%360,7);
 
 function toast(m,ok=1){const e=document.createElement('div');e.className=ok?'ok':'no';e.textContent=m;$('#toast').append(e);setTimeout(()=>e.remove(),2800)}
 async function api(a,p={}){
- let j;try{const r=await fetch(API,{method:'POST',body:JSON.stringify({pass,a,...p})});j=await r.json()}catch(e){throw new Error('Tidak bisa terhubung. Periksa sinyal dan URL web app.')}
+ if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(API))throw new Error('URL web app di index.html belum benar. Harus diawali https://script.google.com/ dan berakhiran /exec.');
+ let r,j;
+ try{r=await fetch(API,{method:'POST',body:JSON.stringify({pass,a,...p})})}catch(e){throw new Error('Tidak bisa menghubungi server. Cek sinyal, dan pastikan akses deployment Apps Script adalah "Siapa saja".')}
+ try{j=await r.json()}catch(e){throw new Error('Balasan server bukan data aplikasi (kode '+r.status+'). Pastikan URL berakhiran /exec dan Code.gs terbaru sudah di-deploy.')}
  if(!j.ok){if(/Passphrase/.test(j.error)){localStorage.removeItem(PWK);pass=''}throw new Error(j.error)}return j.data}
 
 function nav(){$('#nav').innerHTML=TABS.map(t=>`<button class="${tab===t[0]?'on':''}" onclick="go('${t[0]}')"><span>${t[1]}</span>${t[2]}</button>`).join('')}
 function go(t){tab=t;cur=null;bi=0;show();scrollTo(0,0)}
 function open1(n){tab='trip';cur=D.trip.find(t=>t.name===n);bi=0;show();scrollTo(0,0)}
 function show(){
- nav();const a=$('#app');
- if(!pass){a.innerHTML=`<h1>Rencana Kita</h1><small>Masukkan passphrase (angka) untuk membuka data.</small><div class="card" style="margin-top:18px"><label>Passphrase</label><input type="password" id="pw" inputmode="numeric" pattern="[0-9]*" autocomplete="current-password"><button class="btn" style="margin-top:16px" onclick="login()">Buka</button></div>`;return}
+ nav();const a=$('#app');document.body.classList.toggle('in',!!pass);$('#nav').style.display=pass?'':'none';
+ if(!pass){a.innerHTML=`<div class="login"><h1>Rencana Kita</h1><small>Masukkan passphrase (angka) untuk membuka data.</small><div class="card" style="margin-top:18px"><label>Passphrase</label><input type="password" id="pw" inputmode="numeric" pattern="[0-9]*" autocomplete="current-password"><button class="btn" style="margin-top:16px" onclick="login()">Buka</button></div></div>`;return}
  const S=tab==='home'?null:cu();
  a.innerHTML=tab==='home'?home():tab==='trip'?(cur?detail(cur):list()):(S?detail(S):`<div class="empty card"><div>🔍</div><b>Tab tidak ditemukan</b><small>Pastikan nama tab di spreadsheet tidak diubah.</small></div>`);
  if(LATIHAN)a.insertAdjacentHTML('afterbegin','<span class="tag" style="--h:40;margin:0 0 8px">Mode latihan</span>');
@@ -153,16 +182,16 @@ function home(){
  const pl=plans(D.vision[0]?.blocks.find(b=>/^KEY/i.test(b.title))),pk=pl.length?`<h2>Pengingat key plan</h2>`+pl.map(x=>`<div class="card"><b>${esc(x.g)}</b><small>mulai ${idDate(pd(x.s))}</small>${x.steps.map(s=>`<small>${esc(s)}</small>`).join('')}</div>`).join(''):'';
  return `<small>${idDate(n)}</small><h1>Rencana Kita</h1>
  ${nx?`<div class="card hero" onclick="open1('${esc(nx.name)}')"><small>Trip berikutnya</small><div class="big">${esc(nx.title)}</div><small>${idDate(nx.d)}, ${Math.ceil((nx.d-t0)/864e5)} hari lagi</small><div class="row" style="margin-top:12px"><span class="rp">${rp(nx.total)}</span><small>rencana (estimasi)</small></div></div>`:`<div class="empty card"><div>🧭</div><b>Belum ada trip mendatang</b><small>Buat trip baru dari menu Trip.</small></div>`}
- <h2>Aktivitas bulan ini</h2>${mon.length?mon.map(m=>`<div class="card"><b>${esc(m.a)}</b><small>${idDate(m.d)}, ${esc(m.t)}</small></div>`).join(''):'<div class="empty card"><small>Belum ada aktivitas terjadwal bulan ini.</small></div>'}
+ <div class="dash"><h2>Aktivitas bulan ini</h2>${mon.length?mon.map(m=>`<div class="card"><b>${esc(m.a)}</b><small>${idDate(m.d)}, ${esc(m.t)}</small></div>`).join(''):'<div class="empty card"><small>Belum ada aktivitas terjadwal bulan ini.</small></div>'}
  ${vh}${pk}
  <h2>Rekap trip selesai</h2>${ps.length?`<div class="card"><small>${ps.length} trip, total ${rp(ps.reduce((a,t)=>a+val(t),0))}</small></div>`+ps.map(t=>`<div class="card row" onclick="open1('${esc(t.name)}')"><div class="grow"><b>${esc(t.title)}</b><small>${idDate(t.d)}${t.duration?', '+esc(t.duration):''}</small></div><span class="rp">${rp(val(t))}</span></div>`).join(''):'<div class="empty card"><small>Belum ada trip yang selesai.</small></div>'}
  <h2>Perbandingan total budget</h2>${T.length?`<div class="card">${bars(T.map(t=>[t.title+(t.actual>0?'':' (rencana)'),val(t)]),mx)}</div>`:'<div class="empty card"><small>Belum ada data.</small></div>'}
  ${bb.length?`<h2>Baby registry</h2><div class="card"><small>Total rencana</small><div class="big">${rp(Bb.total)}</div><div style="margin-top:12px">${bars(bb,Math.max(...bb.map(x=>x[1])))}</div>${rg?`<small style="margin-top:8px">Registry: ${rg[0]} dari ${rg[1]} item sudah didapat</small>`:''}</div>`:''}
- ${Rn?`<h2>Renovasi rumah</h2><div class="card row" onclick="go('reno')"><div class="grow"><small>Total pengeluaran tercatat</small></div><span class="rp">${rp(Rn.total)}</span></div>`:''}`;
+ ${Rn?`<h2>Renovasi rumah</h2><div class="card row" onclick="go('reno')"><div class="grow"><small>Total pengeluaran tercatat</small></div><span class="rp">${rp(Rn.total)}</span></div>`:''}</div>`;
 }
 function list(){
- return `<h1>Trip</h1><small>Ketuk trip untuk melihat detail.</small><div style="margin:16px 0"><button class="btn" onclick="newTrip()">Buat trip baru</button></div>`+
- (D.trip.length?[...D.trip].sort((a,b)=>(pd(b.date)||0)-(pd(a.date)||0)).map(t=>`<div class="card row" onclick="open1('${esc(t.name)}')"><div class="grow"><b>${esc(t.title)}</b><small>${idDate(pd(t.date))}${t.duration?', '+esc(t.duration):''}</small></div><span class="rp">${rp(val(t))}</span></div>`).join(''):'<div class="empty card"><div>✈️</div><b>Belum ada trip</b><small>Ketuk Buat trip baru untuk memulai.</small></div>');
+ return `<h1>Trip</h1><small>Ketuk trip untuk melihat detail.</small><div style="margin:16px 0"><button class="btn" onclick="newTrip()">Buat trip baru</button></div>`+'<div class="cards">'+
+ (D.trip.length?[...D.trip].sort((a,b)=>(pd(b.date)||0)-(pd(a.date)||0)).map(t=>`<div class="card row" onclick="open1('${esc(t.name)}')"><div class="grow"><b>${esc(t.title)}</b><small>${idDate(pd(t.date))}${t.duration?', '+esc(t.duration):''}</small></div><span class="rp">${rp(val(t))}</span></div>`).join(''):'<div class="empty card"><div>✈️</div><b>Belum ada trip</b><small>Ketuk Buat trip baru untuk memulai.</small></div>')+'</div>';
 }
 function detail(S){
  const bl=S.blocks;if(bi>=bl.length)bi=0;const b=bl[bi];let html='',last='';
@@ -184,7 +213,7 @@ function detail(S){
  ${S.mod==='trip'?tripHero(S):hasMoney?`<div class="card hero" style="margin-top:14px"><small>Total tercatat</small><div class="big">${rp(S.total)}</div></div>`:V}
  ${bbars.length?`<div class="card">${bars(bbars,Math.max(...bbars.map(x=>x[1])))}</div>`:''}
  ${extra}<div class="chips">${bl.map((x,i)=>`<button class="${i===bi?'on':''}" onclick="bi=${i};show()">${esc(bt(x))}</button>`).join('')}</div>
- ${html||`<div class="empty card"><div>📭</div><b>Belum ada data</b><small>${!b||b.ro?'Blok ini hanya bisa dibaca.':'Ketuk + untuk menambah.'}</small></div>`}${tab==='trip'&&S.deletable?`<button class="btn ghost" style="margin-top:26px" onclick="askDelTrip()">Hapus trip ini</button>`:''}`;
+ <div class="cards">${html||`<div class="empty card"><div>📭</div><b>Belum ada data</b><small>${!b||b.ro?'Blok ini hanya bisa dibaca.':'Ketuk + untuk menambah.'}</small></div>`}</div>${tab==='trip'&&S.deletable?`<button class="btn ghost" style="margin-top:26px" onclick="askDelTrip()">Hapus trip ini</button>`:''}`;
 }
 async function tog(row,c){
  const S=cu(),b=S.blocks[bi],it=b.rows.find(x=>x.row===row),nv=!(it.v[c]===true);it.v[c]=nv;show();
