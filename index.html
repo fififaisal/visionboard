@@ -98,7 +98,9 @@ const rp=n=>'Rp '+new Intl.NumberFormat('id-ID').format(+n||0);
 const TABS=[['home','🏠','Beranda'],['trip','✈️','Trip'],['vision','✨','Vision'],['baby','🍼','Baby'],['reno','🔨','Renovasi']];
 const LATIHAN=false;   // true hanya pada salinan latihan: menampilkan penanda "Mode latihan"
 const PWK='pw:'+location.pathname;
-let pass=localStorage.getItem(PWK)||'',D={trip:[],vision:[],baby:[],reno:[]},tab='home',cur=null,bi=0;
+const IDLE_MENIT=15;   // terkunci otomatis bila tidak dipakai selama ini
+let pass='',lastAct=Date.now(),D={trip:[],vision:[],baby:[],reno:[]},tab='home',cur=null,bi=0;
+try{localStorage.removeItem(PWK);localStorage.removeItem('pw')}catch(e){}   // hapus passphrase yang tersimpan oleh versi lama
 const pd=s=>/^\d{4}-\d\d-\d\d$/.test(s)?new Date(s+'T00:00:00'):null;
 const idDate=d=>d?d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'';
 const cu=()=>tab==='trip'?cur:D[tab][0];
@@ -130,7 +132,12 @@ function show(){
  document.querySelector('.fab')?.remove();
  if(S&&S.blocks[bi]&&!S.blocks[bi].ro)document.body.insertAdjacentHTML('beforeend','<button class="fab" onclick="openForm()" aria-label="Tambah">+</button>');
 }
-async function login(){pass=$('#pw').value.trim();if(!pass)return toast('Passphrase belum diisi',0);localStorage.setItem(PWK,pass);await load()}
+function logout(){closeSheet();pass='';D={trip:[],vision:[],baby:[],reno:[]};tab='home';cur=null;show();scrollTo(0,0)}
+function lock(){logout();toast('Terkunci karena tidak dipakai. Masukkan passphrase lagi.')}
+['pointerdown','keydown','scroll','touchstart'].forEach(ev=>addEventListener(ev,()=>{lastAct=Date.now()},{passive:true}));
+setInterval(()=>{if(pass&&Date.now()-lastAct>IDLE_MENIT*60000)lock()},20000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pass&&Date.now()-lastAct>IDLE_MENIT*60000)lock()});
+async function login(){pass=$('#pw').value.trim();if(!pass)return toast('Passphrase belum diisi',0);await load()}
 async function load(){
  $('#app').innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
  try{const all=await api('list');D={trip:[],vision:[],baby:[],reno:[]};all.forEach(s=>D[s.mod].push(s));show()}
@@ -188,7 +195,7 @@ function home(){
  <h2>Rekap trip selesai</h2>${ps.length?`<div class="card"><small>${ps.length} trip, total ${rp(ps.reduce((a,t)=>a+val(t),0))}</small></div>`+ps.map(t=>`<div class="card row" onclick="open1('${esc(t.name)}')"><div class="grow"><b>${esc(t.title)}</b><small>${idDate(t.d)}${t.duration?', '+esc(t.duration):''}</small></div><span class="rp">${rp(val(t))}</span></div>`).join(''):'<div class="empty card"><small>Belum ada trip yang selesai.</small></div>'}
  <h2>Perbandingan total budget</h2>${T.length?`<div class="card">${bars(T.map(t=>[t.title+(t.actual>0?'':' (rencana)'),val(t)]),mx)}</div>`:'<div class="empty card"><small>Belum ada data.</small></div>'}
  ${bb.length?`<h2>Baby registry</h2><div class="card"><small>Total rencana</small><div class="big">${rp(Bb.total)}</div><div style="margin-top:12px">${bars(bb,Math.max(...bb.map(x=>x[1])))}</div>${rg?`<small style="margin-top:8px">Registry: ${rg[0]} dari ${rg[1]} item sudah didapat</small>`:''}</div>`:''}
- ${Rn?`<h2>Renovasi rumah</h2><div class="card row" onclick="go('reno')"><div class="grow"><small>Total pengeluaran tercatat</small></div><span class="rp">${rp(Rn.total)}</span></div>`:''}</div>`;
+ ${Rn?`<h2>Renovasi rumah</h2><div class="card row" onclick="go('reno')"><div class="grow"><small>Total pengeluaran tercatat</small></div><span class="rp">${rp(Rn.total)}</span></div>`:''}</div><div style="margin:34px 0 10px"><button class="btn ghost" onclick="logout()">Keluar dari perangkat ini</button><small style="margin-top:8px">Passphrase tidak disimpan di perangkat. Menutup aplikasi atau tab, memuat ulang, atau tidak dipakai selama ${IDLE_MENIT} menit akan mengunci aplikasi. Tombol ini mengunci sekarang.</small></div>`;
 }
 function list(){
  return `<h1>Trip</h1><small>Ketuk trip untuk melihat detail.</small><div style="margin:16px 0"><button class="btn" onclick="newTrip()">Buat trip baru</button></div>`+'<div class="cards">'+
